@@ -56,132 +56,6 @@ states state = STOP;
 uint32_t startScan;
 uint32_t stopScan;
 
-
-void setup()
-{
-  Serial.begin(115200);
-  Wire.begin();
-
-#if defined WIRE_IMPLEMENT_WIRE1 || WIRE_INTERFACES_COUNT > 1
-  Wire1.begin();
-  wirePortCount++;
-#endif
-#if defined WIRE_IMPLEMENT_WIRE2 || WIRE_INTERFACES_COUNT > 2
-  Wire2.begin();
-  wirePortCount++;
-#endif
-#if defined WIRE_IMPLEMENT_WIRE3 || WIRE_INTERFACES_COUNT > 3
-  Wire3.begin();
-  wirePortCount++;
-#endif
-
-  wi = &Wire;
-
-  setSpeed('9');
-  displayHelp();
-}
-
-void loop()
-{
-  char command = getCommand();
-  switch (command)
-  {
-    case '@':
-      selectedWirePort = (selectedWirePort + 1) % wirePortCount;
-      Serial.print(F("I2C PORT=Wire"));
-      Serial.println(selectedWirePort);
-      switch (selectedWirePort)
-      {
-        case 0:
-          wi = &Wire;
-          break;
-        case 1:
-#if defined WIRE_IMPLEMENT_WIRE1 || WIRE_INTERFACES_COUNT > 1
-          wi = &Wire1;
-#endif
-          break;
-        case 2:
-#if defined WIRE_IMPLEMENT_WIRE2 || WIRE_INTERFACES_COUNT > 2
-          wi = &Wire2;
-#endif
-          break;
-        case 3:
-#if defined WIRE_IMPLEMENT_WIRE3 || WIRE_INTERFACES_COUNT > 3
-          wi = &Wire3;
-#endif
-          break;
-      }
-      break;
-
-    case 's':
-      state = ONCE;
-      break;
-    case 'c':
-      state = CONT;
-      break;
-    case 'd':
-      delayFlag = !delayFlag;
-      Serial.print(F("<delay="));
-      Serial.println(delayFlag ? F("5>") : F("0>"));
-      break;
-
-    case 'e':
-      // eeprom test TODO
-      break;
-
-    case 'h':
-      header = !header;
-      Serial.print(F("<header="));
-      Serial.println(header ? F("yes>") : F("no>"));
-      break;
-    case 'p':
-      printAll = !printAll;
-      Serial.print(F("<print="));
-      Serial.println(printAll ? F("all>") : F("found>"));
-      break;
-
-    case '0':
-    case '1':
-    case '2':
-    case '4':
-    case '8':
-    case '9':
-      setSpeed(command);
-      break;
-
-    case 'a':
-      setAddress();
-      break;
-
-    case 'q':
-    case '?':
-      state = HELP;
-      break;
-    default:
-      break;
-  }
-
-  switch (state)
-  {
-    case ONCE:
-      I2Cscan();
-      state = HELP;
-      break;
-    case CONT:
-      I2Cscan();
-      delay(1000);
-      break;
-    case HELP:
-      displayHelp();
-      state = STOP;
-      break;
-    case STOP:
-      break;
-    default: // ignore all non commands
-      break;
-  }
-}
-
 void setAddress()
 {
   if (addressStart == 0)
@@ -360,5 +234,138 @@ void I2Cscan()
     Serial.print(F(" devices found in "));
     Serial.print(stopScan - startScan);
     Serial.println(F(" milliseconds."));
+  }
+}
+
+void setup()
+{
+  Serial.begin(115200);
+  Wire.begin();
+
+#if defined WIRE_IMPLEMENT_WIRE1 || WIRE_INTERFACES_COUNT > 1
+  Wire1.begin();
+  wirePortCount++;
+#endif
+#if defined WIRE_IMPLEMENT_WIRE2 || WIRE_INTERFACES_COUNT > 2
+  Wire2.begin();
+  wirePortCount++;
+#endif
+#if defined WIRE_IMPLEMENT_WIRE3 || WIRE_INTERFACES_COUNT > 3
+  Wire3.begin();
+  wirePortCount++;
+#endif
+
+  wi = &Wire;
+
+  setSpeed('9');
+
+Serial.print("SDA = ");
+Serial.println(SDA);
+Serial.print("SCL = ");
+Serial.println(SCL);
+Serial.println();
+
+
+  displayHelp();
+}
+
+void loop()
+{
+  char command = getCommand();
+  switch (command)
+  {
+    case '@':
+      selectedWirePort = (selectedWirePort + 1) % wirePortCount;
+      Serial.print(F("I2C PORT=Wire"));
+      Serial.println(selectedWirePort);
+      switch (selectedWirePort)
+      {
+        case 0:
+          wi = &Wire;
+          break;
+        case 1:
+#if defined WIRE_IMPLEMENT_WIRE1 || WIRE_INTERFACES_COUNT > 1
+          wi = &Wire1;
+#endif
+          break;
+        case 2:
+#if defined WIRE_IMPLEMENT_WIRE2 || WIRE_INTERFACES_COUNT > 2
+          wi = &Wire2;
+#endif
+          break;
+        case 3:
+#if defined WIRE_IMPLEMENT_WIRE3 || WIRE_INTERFACES_COUNT > 3
+          wi = &Wire3;
+#endif
+          break;
+      }
+      break;
+
+    case 's':
+      state = ONCE;
+      break;
+    case 'c':
+      state = CONT;
+      break;
+    case 'd':
+      delayFlag = !delayFlag;
+      Serial.print(F("<delay="));
+      Serial.println(delayFlag ? F("5>") : F("0>"));
+      break;
+
+    case 'e':
+      // eeprom test TODO
+      break;
+
+    case 'h':
+      header = !header;
+      Serial.print(F("<header="));
+      Serial.println(header ? F("yes>") : F("no>"));
+      break;
+    case 'p':
+      printAll = !printAll;
+      Serial.print(F("<print="));
+      Serial.println(printAll ? F("all>") : F("found>"));
+      break;
+
+    case '0':
+    case '1':
+    case '2':
+    case '4':
+    case '8':
+    case '9':
+      setSpeed(command);
+      break;
+
+    case 'a':
+      setAddress();
+      break;
+
+    case 'q':
+    case '?':
+      state = HELP;
+      break;
+    default:
+      break;
+  }
+
+  switch (state)
+  {
+    case ONCE:
+      I2Cscan();
+      state = HELP;
+      break;
+    case CONT:
+      I2Cscan();
+      delay(1000);
+      break;
+    case HELP:
+      displayHelp();
+      state = STOP;
+      break;
+    case STOP:
+      break;
+    default: // ignore all non commands
+      break;
   }
 }
