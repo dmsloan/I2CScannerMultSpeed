@@ -263,6 +263,10 @@ Serial.print("SDA = ");
 Serial.println(SDA);
 Serial.print("SCL = ");
 Serial.println(SCL);
+Serial.print("SDA_OLED = ");
+Serial.println(SDA_OLED);
+Serial.print("SCL_OLED = ");
+Serial.println(SCL_OLED);
 Serial.println();
 
 
