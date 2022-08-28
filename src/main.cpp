@@ -263,10 +263,14 @@ Serial.print("SDA = ");
 Serial.println(SDA);
 Serial.print("SCL = ");
 Serial.println(SCL);
-Serial.print("SDA_OLED = ");
-Serial.println(SDA_OLED);
-Serial.print("SCL_OLED = ");
-Serial.println(SCL_OLED);
+#if defined SDA_OLED
+  Serial.print("SDA_OLED = ");
+  Serial.println(SDA_OLED);
+  Serial.print("SCL_OLED = ");
+  Serial.println(SCL_OLED);
+#else
+  Serial.println("SDA_OLED is not defined");
+#endif
 Serial.println();
 
 
